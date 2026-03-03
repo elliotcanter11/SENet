@@ -182,8 +182,8 @@ if __name__ == '__main__':
         img_root = 'dataset/COD/TrainDataset/Imgs/'
         gt_root = 'dataset/COD/TrainDataset/GT/'
     elif opt.task == 'sod':
-        img_root = 'dataset/SOD/TrainDataset-DUTS-TR/Imgs/'
-        gt_root = 'dataset/SOD/TrainDataset-DUTS-TR/GT/'
+        img_root = 'dataset/SOD/TrainDataset/Imgs/'
+        gt_root = 'dataset/SOD/TrainDataset/GT/'
 
     train_loader = get_loader(image_root=img_root, gt_root=gt_root, batchsize=opt.batchsize, trainsize=opt.trainsize)
  
