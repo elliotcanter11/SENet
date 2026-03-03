@@ -174,15 +174,16 @@ def train(train_loader, model, optimizer, epoch, loss_fn):
         file.write('[Saving Snapshot:]' + save_path + 'mae-%d.pth' % epoch + '\n')
     '''
     if (epoch + 1) % 5 == 0 or (epoch + 1) == opt.epochs:
-    checkpoint = {
-        'epoch': epoch,
-        'model_state_dict': model.state_dict(),
-        'optimizer_state_dict': optimizer.state_dict(),
-    }
-    save_file = os.path.join(save_path, f'senet_epoch_{epoch+1}.pth') #epoch+1?
-    torch.save(checkpoint, save_file)
-    print('[Saving Checkpoint:]', save_file)
-    file.write('[Saving Checkpoint:] ' + save_file + '\n')
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'total_epochs': opt.epochs
+        }
+        save_file = os.path.join(save_path, f'senet_epoch_{epoch+1}.pth') #epoch+1?
+        torch.save(checkpoint, save_file)
+        print('[Saving Checkpoint:]', save_file)
+        file.write('[Saving Checkpoint:] ' + save_file + '\n')
         
 if __name__ == '__main__':
 
@@ -199,6 +200,7 @@ if __name__ == '__main__':
         checkpoint = torch.load(opt.resume)
         model.load_state_dict(checkpoint['model_state_dict'])
         optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        opt.epochs = checkpoint['total_epochs']
         start_epoch = checkpoint['epoch'] + 1
         print(f"Resumed from epoch {start_epoch}")
 
@@ -236,6 +238,7 @@ if __name__ == '__main__':
             'epoch': epoch,
             'model_state_dict': model.state_dict(),
             'optimizer_state_dict': optimizer.state_dict(),
+            'total_epochs': opt.epochs
         }
     
         emergency_path = os.path.join(save_path, 'interrupted_checkpoint.pth')
