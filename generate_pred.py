@@ -25,10 +25,11 @@ model.load_state_dict(torch.load(opt.checkpoint_path))
 
 model.eval()
 # for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
-for _data_name in ['DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:
-    data_path = './dataset/SOD/TestDataset/{}/'.format(_data_name)
-    save_path = './results/JT_SOD2000/{}/'.format(_data_name) #改这里
-    
+#for _data_name in ['DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:
+    #data_path = './dataset/SOD/TestDataset/{}/'.format(_data_name)
+    #save_path = './results/JT_SOD2000/{}/'.format(_data_name) #改这里
+    data_path = './dataset/SOD/TestDataset/'
+    save_path = './results/SOD/'
     os.makedirs(save_path, exist_ok=True)
 
     image_root = '{}/Imgs/'.format(data_path)
@@ -48,10 +49,12 @@ for _data_name in ['DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:
         res = (res - res.min()) / (res.max() - res.min() + 1e-8)
         imageio.imwrite(save_path+name, (res*255).astype(np.uint8))
 
-for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
+#for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
 # for _data_name in ['DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:
-    data_path = './dataset/COD/TestDataset/{}/'.format(_data_name)
-    save_path = './results/JT_SOD2000/{}/'.format(_data_name) #改这里
+    #data_path = './dataset/COD/TestDataset/{}/'.format(_data_name)
+    #save_path = './results/JT_SOD2000/{}/'.format(_data_name) #改这里
+    data_path = './dataset/COD/TestDataset/'
+    save_path = './results/COD/'
     
     os.makedirs(save_path, exist_ok=True)
 
