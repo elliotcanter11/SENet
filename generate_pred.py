@@ -13,6 +13,7 @@ from LICM import set_LICM
 parser = argparse.ArgumentParser()
 parser.add_argument('--testsize', type=int, default=384, help='testing size')
 parser.add_argument('--checkpoint_path', type=str, default='/media/lab532/MAE_COD_SOD/checkpoints/JT_SOD2000/mae-24.pth')  #改这里
+parser.add_argument('--task', type=str, default='cod')
 opt = parser.parse_args()
 
 # model = mae_vit_base_patch16_dec512d8b()
@@ -26,6 +27,7 @@ model.load_state_dict(torch.load(opt.checkpoint_path))
 model.eval()
 # for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
 #for _data_name in ['DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:
+if opt.task == 'sod':
     #data_path = './dataset/SOD/TestDataset/{}/'.format(_data_name)
     #save_path = './results/JT_SOD2000/{}/'.format(_data_name) #改这里
     data_path = './dataset/SOD/TestDataset/'
@@ -51,6 +53,7 @@ model.eval()
 
 #for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
 # for _data_name in ['DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:
+if opt.task == 'cod':
     #data_path = './dataset/COD/TestDataset/{}/'.format(_data_name)
     #save_path = './results/JT_SOD2000/{}/'.format(_data_name) #改这里
     data_path = './dataset/COD/TestDataset/'
