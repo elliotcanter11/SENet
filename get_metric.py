@@ -14,8 +14,8 @@ from py_sod_metrics import MAE, Emeasure, Fmeasure, Smeasure, WeightedFmeasure
 method='JT_SOD2000' #改这里
 # for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
 #for _data_name in [ 'DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:#
-    mask_root = './dataset/SOD/TestDataset/{}/GT'.format(_data_name) #
-    pred_root = './results/{}/{}/'.format(method, _data_name)        #
+    #mask_root = './dataset/SOD/TestDataset/{}/GT'.format(_data_name) #
+    #pred_root = './results/{}/{}/'.format(method, _data_name)        #
     mask_root = './dataset/SOD/TestDataset/GT'
     pred_root = './results/SOD'
     
