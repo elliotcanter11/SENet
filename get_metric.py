@@ -13,9 +13,12 @@ from py_sod_metrics import MAE, Emeasure, Fmeasure, Smeasure, WeightedFmeasure
 
 method='JT_SOD2000' #改这里
 # for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
-for _data_name in [ 'DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:#
+#for _data_name in [ 'DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:#
     mask_root = './dataset/SOD/TestDataset/{}/GT'.format(_data_name) #
     pred_root = './results/{}/{}/'.format(method, _data_name)        #
+    mask_root = './dataset/SOD/TestDataset/GT'
+    pred_root = './results/SOD'
+    
     # pred_root = '/media/lab532/COD/SINet-master/Result/sod/{}/'.format( _data_name)
     mask_name_list = sorted(os.listdir(mask_root))
     FM = Fmeasure()
@@ -56,10 +59,13 @@ for _data_name in [ 'DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:#
     file=open("metric/JT_SOD2000.txt", "a")#改这里
     file.write(method+' '+_data_name+' '+str(results)+'\n')
 
-for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
+#for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
 # for _data_name in [ 'DUTS-TE', 'DUT-OMRON', 'HKU-IS', 'ECSSD', 'PASCAL-S']:#
-    mask_root = './dataset/COD/TestDataset/{}/GT'.format(_data_name) #
-    pred_root = './results/{}/{}/'.format(method, _data_name)        #
+    #mask_root = './dataset/COD/TestDataset/{}/GT'.format(_data_name) #
+    #pred_root = './results/{}/{}/'.format(method, _data_name)        #
+    mask_root = './dataset/COD/TestDataset/GT'
+    pred_root = './results/COD'
+
     mask_name_list = sorted(os.listdir(mask_root))
     FM = Fmeasure()
     WFM = WeightedFmeasure()
