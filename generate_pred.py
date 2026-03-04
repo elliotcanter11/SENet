@@ -44,7 +44,7 @@ if opt.task == 'sod':
         gt /= (gt.max() + 1e-8)
         image = image.cuda()
 
-        res = model(image)
+        res = model(image)[0]
  
         res = F.interpolate(res, size=gt.shape, mode='bilinear', align_corners=False)
         res = res.sigmoid().data.cpu().numpy().squeeze()
@@ -71,7 +71,7 @@ if opt.task == 'cod':
         gt /= (gt.max() + 1e-8)
         image = image.cuda()
 
-        res = model(image)
+        res = model(image)[0]
         res = F.interpolate(res, size=gt.shape, mode='bilinear', align_corners=False)
         res = res.sigmoid().data.cpu().numpy().squeeze()
         res = (res - res.min()) / (res.max() - res.min() + 1e-8)
