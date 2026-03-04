@@ -21,7 +21,8 @@ model = SENet()
 # set_LICM(model=model)
 model = model.cuda()
 model = nn.DataParallel(model)
-model.load_state_dict(torch.load(opt.checkpoint_path)['model_state_dict'])
+#model.load_state_dict(torch.load(opt.checkpoint_path)['model_state_dict'])
+model.load_state_dict(torch.load(opt.checkpoint_path))
 
 model.eval()
 # for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
