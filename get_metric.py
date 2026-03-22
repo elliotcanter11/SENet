@@ -117,5 +117,5 @@ if opt.task == 'cod':
     }
 
     print(results)
-    file=open("metric/JT_SOD2000.txt", "a")#改这里
-    file.write(method+' '+_data_name+' '+str(results)+'\n')
+    #file=open("metric/JT_SOD2000.txt", "a")#改这里
+    #file.write(method+' '+_data_name+' '+str(results)+'\n')
