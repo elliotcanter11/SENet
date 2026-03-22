@@ -30,8 +30,11 @@ class RGBtoRGBLAB(object):
         return torch.from_numpy(six_ch.transpose(2, 0, 1)).float()
 
 
-lab_mean = torch.tensor([0.45, 0.02, 0.03]).view(3,1,1)
-lab_std  = torch.tensor([0.15, 0.25, 0.25]).view(3,1,1)
+rgb_mean = torch.tensor([0.434, 0.424, 0.327]).view(3,1,1)
+rgb_std  = torch.tensor([0.254, 0.242, 0.247]).view(3,1,1)
+
+lab_mean = torch.tensor([0.447, 0.493, 0.553]).view(3,1,1)
+lab_std  = torch.tensor([0.246, 0.052, 0.077]).view(3,1,1)
 
 class NormalizeRGBLAB(object):
     """Normalize RGB and LAB parts separately"""
@@ -40,12 +43,10 @@ class NormalizeRGBLAB(object):
         rgb = img[:3]
         lab = img[3:]
         
-        # ImageNet normalization for RGB
-        rgb = (rgb - torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)) / \
-              torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+        # Custom normalization for RGB
+        rgb = (rgb - rgb_mean) / rgb_std
         
-        # Simple centering for LAB
-        lab = (lab - 0.5) / 0.25
+        # Custom normalization for LAB
         lab = (lab - lab_mean) / lab_std
         
         return torch.cat([rgb, lab], dim=0)
