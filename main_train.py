@@ -94,11 +94,13 @@ def dynamic_structure_loss1(pred, mask):
 
 def recon_loss(imgs, pred, mask):
     """
-    imgs: [N, 3, H, W]
+    imgs: [N, 6, H, W] (RGB+LAB)
     pred: [N, L, p*p*3]
     mask: [N, L], 0 is keep, 1 is remove, 
     """
-    target = patchify(imgs)
+    # Use only RGB channels for reconstruction loss
+    rgb_imgs = imgs[:, :3, :, :]
+    target = patchify(rgb_imgs)
     
     mean = target.mean(dim=-1, keepdim=True)
     var = target.var(dim=-1, keepdim=True)

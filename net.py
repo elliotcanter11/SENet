@@ -113,15 +113,19 @@ def interpolate_pos_embed(model, checkpoint_model):
 class MaskedAutoencoderViT(nn.Module):
     """ Masked Autoencoder with VisionTransformer backbone
     """
-    def __init__(self, img_size=224, patch_size=16, in_chans=3,
+    def __init__(self, img_size=224, patch_size=16, in_chans=6,
                  embed_dim=1024, depth=24, num_heads=16,
                  decoder_embed_dim=512, decoder_depth=8, decoder_num_heads=16,
                  mlp_ratio=4., norm_layer=nn.LayerNorm, norm_pix_loss=False):
         super().__init__()
 
         # --------------------------------------------------------------------------
+        # Input projection: 6-channel (RGB+LAB) -> 3-channel for patch embedding
+        self.input_proj = nn.Conv2d(in_chans, 3, kernel_size=1, bias=True) if in_chans != 3 else None
+        
+        # --------------------------------------------------------------------------
         # MAE encoder specifics
-        self.patch_embed = PatchEmbed(img_size, patch_size, in_chans, embed_dim)
+        self.patch_embed = PatchEmbed(img_size, patch_size, 3, embed_dim)
         num_patches = self.patch_embed.num_patches
 
         self.cls_token = nn.Parameter(torch.zeros(1, 1, embed_dim))
@@ -209,6 +213,10 @@ class MaskedAutoencoderViT(nn.Module):
         return x_masked, mask, ids_restore
 
     def forward_encoder(self, x, mask_ratio=0):
+        # project 6-channel input to 3-channel if needed
+        if self.input_proj is not None:
+            x = self.input_proj(x)
+        
         # embed patches
         x = self.patch_embed(x)
 
@@ -275,7 +283,7 @@ def SENet(**kwargs):
 if __name__ == '__main__':
     model = SENet()
     set_LICM(model=model)
-    input1 = torch.randn(1, 3, 384, 384)
+    input1 = torch.randn(1, 6, 384, 384)
     output,_,_ = model(input1)
     print(output.shape)
 

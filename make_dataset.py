@@ -3,7 +3,53 @@ from PIL import Image
 import torch.utils.data as data
 import torchvision.transforms as transforms
 import random
+import numpy as np
+import torch
+from skimage.color import rgb2lab
 random.seed(3407)
+
+
+class RGBtoRGBLAB(object):
+    """Convert RGB tensor to concatenated RGB+LAB tensor"""
+    def __call__(self, img):
+        # img shape: [3, H, W], values in [0, 1]
+        rgb = img.numpy().transpose(1, 2, 0)  # C,H,W -> H,W,C
+        
+        # Convert to LAB
+        lab = rgb2lab(rgb)  # L:[0,100], a:[-127,127], b:[-127,127]
+        
+        # Normalize LAB to [0, 1]
+        lab_norm = np.stack([
+            lab[..., 0] / 100.0,
+            (lab[..., 1] + 128) / 256.0,
+            (lab[..., 2] + 128) / 256.0
+        ], axis=-1)
+        
+        # Concatenate [RGB, LAB] and convert to tensor
+        six_ch = np.concatenate([rgb, lab_norm], axis=2)
+        return torch.from_numpy(six_ch.transpose(2, 0, 1)).float()
+
+
+lab_mean = torch.tensor([0.45, 0.02, 0.03]).view(3,1,1)
+lab_std  = torch.tensor([0.15, 0.25, 0.25]).view(3,1,1)
+
+class NormalizeRGBLAB(object):
+    """Normalize RGB and LAB parts separately"""
+    def __call__(self, img):
+        # img shape: [6, H, W], values in [0, 1]
+        rgb = img[:3]
+        lab = img[3:]
+        
+        # ImageNet normalization for RGB
+        rgb = (rgb - torch.tensor([0.485, 0.456, 0.406]).view(3, 1, 1)) / \
+              torch.tensor([0.229, 0.224, 0.225]).view(3, 1, 1)
+        
+        # Simple centering for LAB
+        lab = (lab - 0.5) / 0.25
+        lab = (lab - lab_mean) / lab_std
+        
+        return torch.cat([rgb, lab], dim=0)
+
 
 class make_Dataset(data.Dataset):
     def __init__(self, image_root, gt_root, trainsize):
@@ -18,7 +64,8 @@ class make_Dataset(data.Dataset):
         self.img_transform = transforms.Compose([                            #对图片进行预处理
             transforms.Resize((trainsize, trainsize)),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+            RGBtoRGBLAB(),
+            NormalizeRGBLAB()])
  
         self.gt_transform = transforms.Compose([
             transforms.Resize((trainsize, trainsize)),
@@ -67,7 +114,8 @@ class test_dataset:
         self.img_transform = transforms.Compose([
             transforms.Resize((testsize, testsize)),
             transforms.ToTensor(),
-            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])])
+            RGBtoRGBLAB(),
+            NormalizeRGBLAB()])
         
         self.gt_transform = transforms.ToTensor()
 
