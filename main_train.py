@@ -29,6 +29,8 @@ def get_parser():
                         default=0.05, help='masking ratio')                    
     parser.add_argument('--pretrained_mae_path', type=str,
                         default='pretrained_model/mae_visualize_vit_base.pth')#MAE pretrained weight
+    parser.add_argument('--resume', type=str, 
+                        default=None, help='path to checkpoint to resume from')
     
     #params that need to be modified          
     
@@ -165,10 +167,23 @@ def train(train_loader, model, optimizer, epoch, loss_fn):
 
     save_path = opt.weight_save_path
     os.makedirs(save_path, exist_ok=True)
+    '''
     if (epoch + 1) % 5 == 0 or (epoch + 1) == opt.epochs:
         torch.save(model.state_dict(), save_path + 'senet-%d.pth' % epoch)
         print('[Saving Snapshot:]', save_path + 'senet-%d.pth' % epoch)
         file.write('[Saving Snapshot:]' + save_path + 'mae-%d.pth' % epoch + '\n')
+    '''
+    if (epoch + 1) % 5 == 0 or (epoch + 1) == opt.epochs:
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'total_epochs': opt.epochs
+        }
+        save_file = os.path.join(save_path, f'senet_epoch_{epoch+1}.pth') #epoch+1?
+        torch.save(checkpoint, save_file)
+        print('[Saving Checkpoint:]', save_file)
+        file.write('[Saving Checkpoint:] ' + save_file + '\n')
         
 if __name__ == '__main__':
 
@@ -177,6 +192,17 @@ if __name__ == '__main__':
     model = build_model()
 
     optimizer = torch.optim.Adam(model.parameters(), opt.lr)
+
+    start_epoch = 0
+
+    if opt.resume is not None:
+        print(f"Loading checkpoint from {opt.resume}")
+        checkpoint = torch.load(opt.resume)
+        model.load_state_dict(checkpoint['model_state_dict'])
+        optimizer.load_state_dict(checkpoint['optimizer_state_dict'])
+        opt.epochs = checkpoint['total_epochs']
+        start_epoch = checkpoint['epoch'] + 1
+        print(f"Resumed from epoch {start_epoch}")
 
     if opt.task == 'cod':
         img_root = 'dataset/COD/TrainDataset/Imgs/'
@@ -192,9 +218,31 @@ if __name__ == '__main__':
 
     file = open(opt.train_log_path, "a")
     print("Start Training")
-
-    for epoch in range(opt.epochs):
+    '''
+    for epoch in range(start_epoch, opt.epochs):
         poly_lr(optimizer, opt.lr, epoch, opt.epochs)
         train(train_loader, model, optimizer, epoch, loss_fn = Loss_fn)
+    '''
+
+    try:
+        for epoch in range(start_epoch, opt.epochs):
+            poly_lr(optimizer, opt.lr, epoch, opt.epochs)
+            train(train_loader, model, optimizer, epoch, loss_fn=Loss_fn)
+
+    except KeyboardInterrupt:
+        print("\nKeyboardInterrupt detected. Saving emergency checkpoint...")
+        save_path = opt.weight_save_path
+        os.makedirs(save_path, exist_ok=True)
+    
+        checkpoint = {
+            'epoch': epoch,
+            'model_state_dict': model.state_dict(),
+            'optimizer_state_dict': optimizer.state_dict(),
+            'total_epochs': opt.epochs
+        }
+    
+        emergency_path = os.path.join(save_path, 'interrupted_checkpoint.pth')
+        torch.save(checkpoint, emergency_path)
+        print(f"Emergency checkpoint saved at {emergency_path}")
 
     file.close()

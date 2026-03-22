@@ -20,9 +20,9 @@ opt = parser.parse_args()
 model = SENet()
 # set_LICM(model=model)
 model = model.cuda()
-model = nn.DataParallel(model)
-model.load_state_dict(torch.load(opt.checkpoint_path))
-
+#model = nn.DataParallel(model)
+#model.load_state_dict(torch.load(opt.checkpoint_path)['model_state_dict'])
+model.load_state_dict(torch.load(opt.checkpoint_path), strict=False)
 
 model.eval()
 # for _data_name in ['CAMO','CHAMELEON','COD10K','NC4K']:
@@ -44,7 +44,7 @@ if opt.task == 'sod':
         gt /= (gt.max() + 1e-8)
         image = image.cuda()
 
-        res = model(image)
+        res = model(image)[0]
  
         res = F.interpolate(res, size=gt.shape, mode='bilinear', align_corners=False)
         res = res.sigmoid().data.cpu().numpy().squeeze()
@@ -71,7 +71,7 @@ if opt.task == 'cod':
         gt /= (gt.max() + 1e-8)
         image = image.cuda()
 
-        res = model(image)
+        res = model(image)[0]
         res = F.interpolate(res, size=gt.shape, mode='bilinear', align_corners=False)
         res = res.sigmoid().data.cpu().numpy().squeeze()
         res = (res - res.min()) / (res.max() - res.min() + 1e-8)
