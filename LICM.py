@@ -37,13 +37,13 @@ def set_LICM(model, s=1):
             if _.norm1.normalized_shape[0] == 512:
                 _.adapter_attn = LICM(dim=512)
                 _.adapter_mlp = LICM(dim=512)
-                _.s = nn.Parameter(torch.tensor(1.0))
+                _.s = 1
                 bound_method = forward_block.__get__(_, _.__class__)
                 setattr(_, 'forward', bound_method)
             elif _.norm1.normalized_shape[0] == 768:
                 _.adapter_attn = LICM(dim=768)
                 _.adapter_mlp = LICM(dim=768)
-                _.s = nn.Parameter(torch.tensor(1.0))
+                _.s = 1
                 bound_method = forward_block.__get__(_, _.__class__)
                 setattr(_, 'forward', bound_method)
             
