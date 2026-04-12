@@ -17,7 +17,11 @@ class LICM(nn.Module):
     def __init__(self, dim=768, xavier_init=True):
         super().__init__()
 
-        self.adapter_conv = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1)
+        #self.adapter_conv = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1)
+        self.conv3 = nn.Conv2d(3, 3, kernel_size=3, padding=1)
+        self.conv5 = nn.Conv2d(3, 3, kernel_size=5, padding=2)
+        self.fuse = nn.Conv2d(6, 3, kernel_size=1)
+        
         self.adapter_up = nn.Linear(dim, 768)    # equivalent to 1 * 1 Conv
         self.adapter_down = nn.Linear(768, dim)  # equivalent to 1 * 1 Conv
         self.act = QuickGELU()
@@ -26,7 +30,14 @@ class LICM(nn.Module):
         B, N, C = x.shape
         x = self.act(self.adapter_up(x))
         x = x.reshape(B*N, 16, 16, 3).permute(0, 3, 1, 2)
-        x = self.adapter_conv(x)
+
+        x1 = self.conv3(x)
+        x2 = self.conv5(x)
+        x = torch.cat([x1, x2], dim=1)
+        x = self.fuse(x)
+
+        #x = self.adapter_conv(x)
+        
         x = x.permute(0, 2, 3, 1).reshape(B, N, 768)
         x = self.adapter_down(self.act(x))
         return x
