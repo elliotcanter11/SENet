@@ -16,14 +16,8 @@ parser.add_argument('--checkpoint_path', type=str, default='/media/lab532/MAE_CO
 parser.add_argument('--task', type=str, default='cod')
 opt = parser.parse_args()
 
-# model = mae_vit_base_patch16_dec512d8b()
 model = SENet()
-# set_LICM(model=model)
 model = model.cuda()
-#model = nn.DataParallel(model)
-#model.load_state_dict(torch.load(opt.checkpoint_path)['model_state_dict'])
-#model.load_state_dict(torch.load(opt.checkpoint_path), strict=False)
-
 checkpoint = torch.load(opt.checkpoint_path)
 
 #only keep keys that exist in model
