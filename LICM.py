@@ -17,7 +17,7 @@ class LICM(nn.Module):
     def __init__(self, dim=768, xavier_init=True):
         super().__init__()
 
-        self.adapter_conv = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=1)
+        self.adapter_conv = nn.Conv2d(in_channels=3, out_channels=3, kernel_size=3, stride=1, padding=2, dilation=2)
         self.adapter_up = nn.Linear(dim, 768)    # equivalent to 1 * 1 Conv
         self.adapter_down = nn.Linear(768, dim)  # equivalent to 1 * 1 Conv
         self.act = QuickGELU()
